@@ -1,0 +1,112 @@
+#include <iostream>
+#include <string>
+#include <sstream>
+using namespace std;
+
+#define MAX 100
+
+struct ArrayStack {
+    int data[MAX];
+    int top;
+    ArrayStack() : top(-1) {}
+};
+
+// Các hàm đã định nghĩa ở trên
+void initStack(ArrayStack &s) {
+    s.top = -1;
+}
+
+bool isEmpty(ArrayStack s) {
+    return s.top == -1;
+}
+
+bool isFull(ArrayStack s) {
+    return s.top == MAX - 1;
+}
+
+bool push(ArrayStack &s, int value) {
+    if (isFull(s)) {
+        cout << "FULL" << endl;
+        return false;
+    }
+    s.top++;
+    s.data[s.top] = value;
+    return true;
+}
+
+bool pop(ArrayStack &s, int &value) {
+    if (isEmpty(s)) {
+        cout << "EMPTY" << endl;
+        return false;
+    }
+    value = s.data[s.top];
+    s.top--;
+    return true;
+}
+
+bool top(ArrayStack s, int &value) {
+    if (isEmpty(s)) {
+        cout << "EMPTY" << endl;
+        return false;
+    }
+    value = s.data[s.top];
+    return true;
+}
+
+int size(ArrayStack s) {
+    return s.top + 1;
+}
+
+// Hàm xử lý lệnh
+void processCommand(ArrayStack &stack, const string &command) {
+    stringstream ss(command);
+    string cmd;
+    ss >> cmd;
+    
+    if (cmd == "PUSH") {
+        int value;
+        ss >> value;
+        push(stack, value);
+    }
+    else if (cmd == "POP") {
+        int value;
+        if (pop(stack, value)) {
+            cout << value << endl;
+        }
+    }
+    else if (cmd == "TOP") {
+        int value;
+        if (top(stack, value)) {
+            cout << value << endl;
+        }
+    }
+    else if (cmd == "SIZE") {
+        cout << size(stack) << endl;
+    }
+    else if (cmd == "END") {
+        // Kết thúc chương trình
+        return;
+    }
+}
+
+// Hàm main
+int main() {
+    ArrayStack stack;
+    initStack(stack);
+    
+    string command;
+    
+    cout << "Nhap cac lenh (END de ket thuc):" << endl;
+    
+    while (true) {
+        getline(cin, command);
+        
+        if (command == "END") {
+            break;
+        }
+        
+        processCommand(stack, command);
+    }
+    
+    return 0;
+}
