@@ -1,0 +1,134 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+#define MAX 1000
+
+// Định nghĩa các cấu trúc và hàm như trên
+
+// Phiên bản tối ưu sử dụng vector thay vì mảng
+class BracketChecker {
+private:
+    vector<char> stack;
+    
+public:
+    string check(const string &expression) {
+        stack.clear();
+        
+        for (char c : expression) {
+            if (c == '(' || c == '[' || c == '{') {
+                stack.push_back(c);
+            }
+            else if (c == ')' || c == ']' || c == '}') {
+                if (stack.empty()) return "NO";
+                
+                char topChar = stack.back();
+                stack.pop_back();
+                
+                if (!isMatchingPair(topChar, c)) {
+                    return "NO";
+                }
+            }
+        }
+        
+        return stack.empty() ? "YES" : "NO";
+    }
+    
+private:
+    bool isMatchingPair(char open, char close) {
+        return (open == '(' && close == ')') ||
+               (open == '[' && close == ']') ||
+               (open == '{' && close == '}');
+    }
+};
+
+class HTMLTagChecker {
+private:
+    vector<string> stack;
+    
+public:
+    string check(const string &html) {
+        stack.clear();
+        int i = 0;
+        int n = html.length();
+        
+        while (i < n) {
+            if (html[i] == '<') {
+                if (i + 1 < n && html[i + 1] == '/') {
+                    // Closing tag
+                    int j = i + 2;
+                    while (j < n && html[j] != '>') j++;
+                    if (j >= n) return "NO";
+                    
+                    string tagName = html.substr(i + 2, j - i - 2);
+                    
+                    if (stack.empty() || stack.back() != tagName) {
+                        return "NO";
+                    }
+                    stack.pop_back();
+                    
+                    i = j + 1;
+                }
+                else {
+                    // Opening tag
+                    int j = i + 1;
+                    while (j < n && html[j] != '>') j++;
+                    if (j >= n) return "NO";
+                    
+                    string tagName = html.substr(i + 1, j - i - 1);
+                    stack.push_back(tagName);
+                    
+                    i = j + 1;
+                }
+            }
+            else {
+                i++;
+            }
+        }
+        
+        return stack.empty() ? "YES" : "NO";
+    }
+};
+
+// Hàm main với menu
+int main() {
+    BracketChecker bracketChecker;
+    HTMLTagChecker htmlChecker;
+    
+    int choice;
+    string input;
+    
+    do {
+        cout << "\n=== KIEM TRA STACK ===" << endl;
+        cout << "1. Kiem tra dau ngoac" << endl;
+        cout << "2. Kiem tra the HTML" << endl;
+        cout << "0. Thoat" << endl;
+        cout << "Lua chon: ";
+        cin >> choice;
+        cin.ignore();  // Xóa ký tự newline
+        
+        switch (choice) {
+            case 1:
+                cout << "Nhap chuoi ngoac: ";
+                getline(cin, input);
+                cout << "Ket qua: " << bracketChecker.check(input) << endl;
+                break;
+                
+            case 2:
+                cout << "Nhap chuoi HTML: ";
+                getline(cin, input);
+                cout << "Ket qua: " << htmlChecker.check(input) << endl;
+                break;
+                
+            case 0:
+                cout << "Tam biet!" << endl;
+                break;
+                
+            default:
+                cout << "Lua chon khong hop le!" << endl;
+        }
+    } while (choice != 0);
+    
+    return 0;
+}
