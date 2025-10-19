@@ -1,0 +1,154 @@
+#include <iostream>
+using namespace std;
+
+// Định nghĩa cấu trúc và các hàm như trên
+
+// Hàm hiển thị toàn bộ queue
+void displayQueue(Queue q) {
+    if (isEmpty(q)) {
+        cout << "Queue rong!" << endl;
+        return;
+    }
+    
+    cout << "Noi dung queue (tu front -> rear): ";
+    Node* current = q.front;
+    while (current != nullptr) {
+        cout << current->data;
+        if (current->next != nullptr) {
+            cout << " -> ";
+        }
+        current = current->next;
+    }
+    cout << " [Count: " << q.count << "]" << endl;
+}
+
+// Hàm xem phần tử đầu queue không xóa
+int front(Queue q) {
+    if (isEmpty(q)) {
+        cout << "Queue rong!" << endl;
+        return -1;
+    }
+    return q.front->data;
+}
+
+// Hàm demo các thao tác cơ bản
+void demoBasicOperations() {
+    cout << "\n" << "DEMO CAC THAO TAC CO BAN TREN QUEUE" << endl;
+    
+    Queue q;
+    initQueue(q);
+    
+    // Test queue rỗng
+    isEmptyDetailed(q);
+    
+    // Test thêm phần tử
+    cout << "\nThem phan tu vao queue" << endl;
+    enqueue(q, 10);
+    enqueue(q, 20);
+    enqueue(q, 30);
+    displayQueue(q);
+    
+    // Test xem phần tử đầu
+    cout << "\nXem phan tu dau queue" << endl;
+    cout << "Phan tu dau queue: " << front(q) << endl;
+    
+    // Test lấy phần tử
+    cout << "\nLay phan tu ra khoi queue" << endl;
+    int value;
+    dequeue(q, value);
+    cout << "Da lay: " << value << endl;
+    displayQueue(q);
+    
+    dequeue(q, value);
+    cout << "Da lay: " << value << endl;
+    displayQueue(q);
+    
+    // Test queue sau khi lấy hết
+    cout << "\nKiem tra queue rong" << endl;
+    dequeue(q, value);
+    cout << "Da lay: " << value << endl;
+    displayQueue(q);
+    isEmptyDetailed(q);
+    
+    // Test thêm lại sau khi rỗng
+    cout << "\nThem lai sau khi rong" << endl;
+    enqueue(q, 40);
+    enqueue(q, 50);
+    displayQueue(q);
+}
+
+// Hàm menu tương tác
+void showMenu() {
+    cout << "\nCHUONG TRINH QUAN LY QUEUE" << endl;
+    cout << "1. Khoi tao queue" << endl;
+    cout << "2. Kiem tra queue rong" << endl;
+    cout << "3. Them phan tu (Enqueue)" << endl;
+    cout << "4. Lay phan tu (Dequeue)" << endl;
+    cout << "5. Xem phan tu dau (Front)" << endl;
+    cout << "6. Hien thi queue" << endl;
+    cout << "7. Demo tu dong" << endl;
+    cout << "0. Thoat" << endl;
+    cout << "Lua chon: ";
+}
+
+int main() {
+    Queue q;
+    initQueue(q);
+    
+    int choice, value;
+    
+    do {
+        showMenu();
+        cin >> choice;
+        
+        switch (choice) {
+            case 1:
+                initQueue(q);
+                break;
+                
+            case 2:
+                isEmptyDetailed(q);
+                break;
+                
+            case 3:
+                cout << "Nhap gia tri can them: ";
+                cin >> value;
+                enqueue(q, value);
+                break;
+                
+            case 4:
+                if (dequeue(q, value)) {
+                    cout << "Da lay duoc: " << value << endl;
+                }
+                break;
+                
+            case 5:
+                if (!isEmpty(q)) {
+                    cout << "Phan tu dau queue: " << front(q) << endl;
+                }
+                break;
+                
+            case 6:
+                displayQueue(q);
+                break;
+                
+            case 7:
+                demoBasicOperations();
+                break;
+                
+            case 0:
+                cout << "Ket thuc chuong trinh!" << endl;
+                break;
+                
+            default:
+                cout << "Lua chon khong hop le!" << endl;
+        }
+    } while (choice != 0);
+    
+    // Giải phóng bộ nhớ còn lại
+    while (!isEmpty(q)) {
+        dequeue(q);
+    }
+    
+    return 0;
+}
