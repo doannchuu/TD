@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Định nghĩa cấu trúc Node
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Hàm tạo node mới
+Node* make_node(int x) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("Khong du bo nho!\n");
+        return NULL;
+    }
+    newNode->data = x;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Hàm thêm vào cuối danh sách
+void push_back(Node** head, int x) {
+    Node* newNode = make_node(x);
+    if (newNode == NULL) return;
+    
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+    
+    Node* temp = *head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+}
+
+// Hàm in danh sách
+void print_list(Node* head) {
+    Node* temp = head;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// HÀM ĐẢO NGƯỢC DANH SÁCH (ITERATIVE) - Sử dụng 3 con trỏ
+Node* reverse(Node* head) {
+    Node* prev = NULL;    // Con trỏ trước
+    Node* cur = head;     // Con trỏ hiện tại
+    Node* next = NULL;    // Con trỏ kế tiếp
+    
+    // Duyệt qua toàn bộ danh sách
+    while (cur != NULL) {
+        // Bước 1: Lưu node kế tiếp
+        next = cur->next;
+        
+        // Bước 2: Đảo liên kết
+        cur->next = prev;
+        
+        // Bước 3: Di chuyển các con trỏ
+        prev = cur;
+        cur = next;
+    }
+    
+    // prev bây giờ là node đầu của danh sách đảo ngược
+    return prev;
+}
+
+// Hàm giải phóng bộ nhớ
+void clear_list(Node** head) {
+    Node* current = *head;
+    while (current != NULL) {
+        Node* next = current->next;
+        free(current);
+        current = next;
+    }
+    *head = NULL;
+}
+
+// Hàm main
+int main() {
+    Node* head = NULL;
+    int n, x;
+    
+    // Nhập số lượng phần tử
+    printf("Nhap so luong phan tu: ");
+    scanf("%d", &n);
+    
+    // Nhập các phần tử
+    printf("Nhap %d phan tu: ", n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &x);
+        push_back(&head, x);
+    }
+    
+    // Hiển thị danh sách trước khi đảo
+    printf("Danh sach truoc khi dao nguoc: ");
+    print_list(head);
+    
+    // Đảo ngược danh sách
+    head = reverse(head);
+    
+    // Hiển thị danh sách sau khi đảo
+    printf("Danh sach sau khi dao nguoc: ");
+    print_list(head);
+    
+    // Giải phóng bộ nhớ
+    clear_list(&head);
+    
+    return 0;
+}
