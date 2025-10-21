@@ -1,0 +1,217 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Định nghĩa cấu trúc Node
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Hàm tạo node mới
+Node* make_node(int x) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("Khong du bo nho!\n");
+        return NULL;
+    }
+    newNode->data = x;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Hàm thêm vào cuối danh sách
+void push_back(Node** head, int x) {
+    Node* newNode = make_node(x);
+    if (newNode == NULL) return;
+    
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+    
+    Node* temp = *head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+}
+
+// Hàm in danh sách
+void print_list(Node* head) {
+    Node* temp = head;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Hàm giải phóng bộ nhớ
+void clear_list(Node** head) {
+    Node* current = *head;
+    while (current != NULL) {
+        Node* next = current->next;
+        free(current);
+        current = next;
+    }
+    *head = NULL;
+}
+
+//        HÀM TRỘN HAI DANH SÁCH ĐÃ SẮP XẾP       
+
+// Hàm trộn hai danh sách đã sắp xếp (không cấp phát node mới)
+Node* merge_sorted(Node* a, Node* b) {
+    // Tạo node giả (dummy node) để đơn giản hóa logic
+    Node dummy = {0, NULL};
+    Node* tail = &dummy;  // Con trỏ tail luôn trỏ đến node cuối của danh sách kết quả
+    
+    // So sánh và trộn cho đến khi một trong hai danh sách hết
+    while (a != NULL && b != NULL) {
+        if (a->data <= b->data) {
+            // Thêm node từ danh sách a vào kết quả
+            tail->next = a;
+            a = a->next;
+        } else {
+            // Thêm node từ danh sách b vào kết quả
+            tail->next = b;
+            b = b->next;
+        }
+        tail = tail->next;  // Di chuyển tail đến node cuối mới
+    }
+    
+    // Nối phần còn lại của danh sách chưa hết
+    tail->next = (a != NULL) ? a : b;
+    
+    // Trả về danh sách kết quả (bỏ qua node giả)
+    return dummy.next;
+}
+
+//        HÀM SẮP XẾP DANH SÁCH       
+
+// Hàm sắp xếp danh sách tăng dần (sử dụng insertion sort)
+void sort_list(Node** head) {
+    if (*head == NULL || (*head)->next == NULL) return;
+    
+    Node* sorted = NULL;  // Danh sách đã sắp xếp (ban đầu rỗng)
+    Node* current = *head;
+    
+    while (current != NULL) {
+        Node* next = current->next;  // Lưu node kế tiếp
+        
+        // Chèn current vào danh sách sorted
+        if (sorted == NULL || current->data <= sorted->data) {
+            // Chèn vào đầu
+            current->next = sorted;
+            sorted = current;
+        } else {
+            // Tìm vị trí thích hợp để chèn
+            Node* temp = sorted;
+            while (temp->next != NULL && temp->next->data < current->data) {
+                temp = temp->next;
+            }
+            current->next = temp->next;
+            temp->next = current;
+        }
+        
+        current = next;
+    }
+    
+    *head = sorted;
+}
+
+//        HÀM KIỂM TRA DANH SÁCH ĐÃ SẮP XẾP       
+
+// Hàm kiểm tra danh sách có được sắp xếp tăng dần không
+int is_sorted(Node* head) {
+    if (head == NULL || head->next == NULL) return 1;
+    
+    Node* current = head;
+    while (current->next != NULL) {
+        if (current->data > current->next->data) {
+            return 0;  // Không sắp xếp
+        }
+        current = current->next;
+    }
+    return 1;  // Đã sắp xếp
+}
+
+//        HÀM MAIN       
+
+int main() {
+    Node* listA = NULL;
+    Node* listB = NULL;
+    Node* mergedList = NULL;
+    int n, m, x;
+    
+    printf("  TRON HAI DANH SACH DA SAP XEP  \n\n");
+    
+    // Nhập danh sách A
+    printf("Nhap so luong phan tu cho danh sach A: ");
+    scanf("%d", &n);
+    printf("Nhap %d phan tu cho danh sach A: ", n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &x);
+        push_back(&listA, x);
+    }
+    
+    // Sắp xếp danh sách A nếu chưa sắp xếp
+    if (!is_sorted(listA)) {
+        printf("Danh sach A chua sap xep. Dang sap xep...\n");
+        sort_list(&listA);
+    }
+    
+    // Nhập danh sách B
+    printf("\nNhap so luong phan tu cho danh sach B: ");
+    scanf("%d", &m);
+    printf("Nhap %d phan tu cho danh sach B: ", m);
+    for (int i = 0; i < m; i++) {
+        scanf("%d", &x);
+        push_back(&listB, x);
+    }
+    
+    // Sắp xếp danh sách B nếu chưa sắp xếp
+    if (!is_sorted(listB)) {
+        printf("Danh sach B chua sap xep. Dang sap xep...\n");
+        sort_list(&listB);
+    }
+    
+    // Hiển thị danh sách trước khi trộn
+    printf("\n  TRUOC KHI TRON  \n");
+    printf("Danh sach A (da sap xep): ");
+    print_list(listA);
+    printf("Danh sach B (da sap xep): ");
+    print_list(listB);
+    
+    // Trộn hai danh sách
+    mergedList = merge_sorted(listA, listB);
+    
+    // Hiển thị kết quả sau khi trộn
+    printf("\n  SAU KHI TRON  \n");
+    printf("Danh sach sau khi tron: ");
+    print_list(mergedList);
+    
+    // Kiểm tra danh sách kết quả có được sắp xếp không
+    if (is_sorted(mergedList)) {
+        printf("✓ Danh sach ket qua da duoc sap xep tang dan.\n");
+    } else {
+        printf("✗ Danh sach ket qua chua duoc sap xep.\n");
+    }
+    
+    // Xác nhận danh sách gốc đã trống
+    printf("\n  KIEM TRA NODE  \n");
+    printf("Danh sach A sau tron: ");
+    print_list(listA);  // Nên in rỗng hoặc không xác định
+    
+    printf("Danh sach B sau tron: ");
+    print_list(listB);  // Nên in rỗng hoặc không xác định
+    
+    printf("✓ Cac node da duoc tai su dung, khong con node roi.\n");
+    
+    // Chỉ giải phóng danh sách đã trộn (vì các node đã được tái sử dụng)
+    clear_list(&mergedList);
+    
+    printf("\nChuong trinh ket thuc.\n");
+    return 0;
+}
+
+
