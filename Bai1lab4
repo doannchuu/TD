@@ -1,0 +1,75 @@
+#include <iostream>
+using namespace std;
+
+// 1. Định nghĩa cấu trúc Node
+struct Node {
+    int data;       // Dữ liệu lưu trữ (số nguyên)
+    Node* next;     // Con trỏ trỏ tới node tiếp theo
+};
+
+// 2. Định nghĩa cấu trúc Danh sách Liên kết
+struct LinkedList {
+    Node* head;     // Con trỏ trỏ tới node đầu tiên
+};
+
+// 3. Hàm khởi tạo danh sách rỗng
+void initList(LinkedList& list) {
+    list.head = NULL;   // Gán head bằng NULL → danh sách rỗng
+}
+
+// 4. Hàm thêm phần tử vào cuối danh sách
+void addTail(LinkedList& list, int value) {
+    // Tạo node mới
+    Node* newNode = new Node;
+    newNode->data = value;
+    newNode->next = NULL;
+    
+    // Trường hợp danh sách rỗng
+    if (list.head == NULL) {
+        list.head = newNode;
+    } 
+    // Trường hợp danh sách có phần tử
+    else {
+        Node* temp = list.head;
+        // Duyệt đến node cuối cùng
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        // Liên kết node cuối với node mới
+        temp->next = newNode;
+    }
+}
+
+// 5. Hàm hiển thị danh sách
+void displayList(LinkedList list) {
+    Node* temp = list.head;  // Bắt đầu từ node đầu tiên
+    
+    // Duyệt qua tất cả các node
+    while (temp != NULL) {
+        cout << temp->data << " ";  // In giá trị
+        temp = temp->next;          // Di chuyển đến node tiếp theo
+    }
+    cout << endl;
+}
+
+// 6. Hàm main - Chương trình chính
+int main() {
+    LinkedList list;        // Khai báo danh sách
+    initList(list);         // Khởi tạo danh sách rỗng
+    
+    int n;
+    cout << "Nhap so luong phan tu n: ";
+    cin >> n;
+    
+    cout << "Nhap " << n << " so nguyen: ";
+    for (int i = 0; i < n; i++) {
+        int value;
+        cin >> value;
+        addTail(list, value);  // Thêm từng số vào danh sách
+    }
+    
+    cout << "Danh sach vua nhap: ";
+    displayList(list);         // Hiển thị danh sách
+    
+    return 0;
+}
