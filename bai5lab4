@@ -1,0 +1,205 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Định nghĩa cấu trúc Node
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Hàm tạo node mới
+Node* make_node(int x) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("Khong du bo nho!\n");
+        return NULL;
+    }
+    newNode->data = x;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Hàm thêm vào cuối danh sách
+void push_back(Node** head, int x) {
+    Node* newNode = make_node(x);
+    if (newNode == NULL) return;
+    
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+    
+    Node* temp = *head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+}
+
+// Hàm in danh sách
+void print_list(Node* head) {
+    Node* temp = head;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Hàm giải phóng bộ nhớ
+void clear_list(Node** head) {
+    Node* current = *head;
+    while (current != NULL) {
+        Node* next = current->next;
+        free(current);
+        current = next;
+    }
+    *head = NULL;
+}
+
+//        PHẦN 1: XÓA PHẦN TỬ TRÙNG       
+
+// Hàm xóa phần tử trùng (giữ lại lần xuất hiện đầu tiên)
+void remove_duplicates_unsorted(Node* head) {
+    if (head == NULL) return;
+    
+    Node* i = head;  // Con trỏ duyệt ngoài
+    
+    // Duyệt từng phần tử i
+    while (i != NULL && i->next != NULL) {
+        Node* j = i;  // Con trỏ duyệt trong, bắt đầu từ i
+        
+        // Duyệt các phần tử phía sau i
+        while (j->next != NULL) {
+            // Nếu tìm thấy phần tử trùng với i
+            if (j->next->data == i->data) {
+                Node* duplicate = j->next;  // Node cần xóa
+                j->next = j->next->next;    // Bỏ qua node trùng
+                free(duplicate);            // Giải phóng bộ nhớ
+            } else {
+                j = j->next;  // Di chuyển đến node kế tiếp
+            }
+        }
+        i = i->next;  // Di chuyển đến node kế tiếp
+    }
+}
+
+//        PHẦN 2: CHÈN CÓ THỨ TỰ       
+
+// Hàm chèn có thứ tự vào danh sách đã sắp xếp tăng dần
+void sorted_insert(Node** head, int x) {
+    Node* newNode = make_node(x);
+    if (newNode == NULL) return;
+    
+    // Trường hợp 1: Danh sách rỗng hoặc chèn vào đầu
+    if (*head == NULL || x < (*head)->data) {
+        newNode->next = *head;
+        *head = newNode;
+        return;
+    }
+    
+    // Trường hợp 2: Tìm vị trí thích hợp để chèn
+    Node* current = *head;
+    
+    // Duyệt đến node có giá trị LỚN HƠN hoặc BẰNG x
+    while (current->next != NULL && current->next->data < x) {
+        current = current->next;
+    }
+    
+    // Chèn newNode vào sau current
+    newNode->next = current->next;
+    current->next = newNode;
+}
+
+//        HÀM SẮP XẾP DANH SÁCH       
+
+// Hàm sắp xếp danh sách tăng dần (sử dụng selection sort)
+void sort_list(Node** head) {
+    if (*head == NULL) return;
+    
+    Node* i = *head;
+    
+    while (i != NULL) {
+        Node* minNode = i;
+        Node* j = i->next;
+        
+        // Tìm phần tử nhỏ nhất trong phần chưa sắp xếp
+        while (j != NULL) {
+            if (j->data < minNode->data) {
+                minNode = j;
+            }
+            j = j->next;
+        }
+        
+        // Đổi chỗ dữ liệu
+        int temp = i->data;
+        i->data = minNode->data;
+        minNode->data = temp;
+        
+        i = i->next;
+    }
+}
+
+//        HÀM MAIN       
+
+int main() {
+    Node* head = NULL;
+    int n, x, choice;
+    
+    printf("Nhap so luong phan tu: ");
+    scanf("%d", &n);
+    
+    printf("Nhap %d phan tu: ", n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &x);
+        push_back(&head, x);
+    }
+    
+    do {
+        printf("\n  MENU CHUC NANG  \n");
+        printf("1. Hien thi danh sach\n");
+        printf("2. Xoa phan tu trung (keep first)\n");
+        printf("3. Sap xep danh sach tang dan\n");
+        printf("4. Chen co thu tu\n");
+        printf("5. Thoat\n");
+        printf("Chon chuc nang: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                printf("Danh sach hien tai: ");
+                print_list(head);
+                break;
+                
+            case 2:
+                remove_duplicates_unsorted(head);
+                printf("Da xoa phan tu trung! Danh sach moi: ");
+                print_list(head);
+                break;
+                
+            case 3:
+                sort_list(&head);
+                printf("Da sap xep danh sach! Danh sach moi: ");
+                print_list(head);
+                break;
+                
+            case 4:
+                printf("Nhap gia tri can chen: ");
+                scanf("%d", &x);
+                sorted_insert(&head, x);
+                printf("Da chen %d! Danh sach moi: ", x);
+                print_list(head);
+                break;
+                
+            case 5:
+                printf("Thoat chuong trinh.\n");
+                break;
+                
+            default:
+                printf("Chuc nang khong hop le!\n");
+        }
+    } while (choice != 5);
+    
+    clear_list(&head);
+    return 0;
+}
