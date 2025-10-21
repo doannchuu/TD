@@ -1,0 +1,115 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node { 
+    int data; 
+    struct Node *next; 
+} Node;
+
+// Tạo node mới
+Node* make_node(int x){
+    Node *p = (Node *)malloc(sizeof(Node));
+    if(p == NULL){
+        printf("Khong du bo nho!\n");
+        return NULL;
+    }
+    p->data = x; 
+    p->next = NULL; 
+    return p;
+}
+
+// Thêm vào cuối danh sách
+void push_back(Node **head, int x){
+    Node *p = make_node(x);
+    if(p == NULL) return;
+    
+    if(*head == NULL){
+        *head = p;
+        return;
+    }
+    Node *cur = *head;
+    while(cur->next != NULL) 
+        cur = cur->next;
+    cur->next = p;
+}
+
+// Thêm vào đầu danh sách
+void push_front(Node **head, int x){
+    Node *p = make_node(x);
+    if(p == NULL) return;
+    
+    p->next = *head;
+    *head = p;
+}
+
+// In danh sách
+void print_list(Node *head){
+    for(Node *cur = head; cur != NULL; cur = cur->next) 
+        printf("%d ", cur->data);
+    printf("\n");
+}
+
+// Đếm số phần tử
+int size(Node *head){
+    int cnt = 0;
+    for(Node *c = head; c != NULL; c = c->next) 
+        cnt++;
+    return cnt;
+}
+
+// Tìm giá trị x đầu tiên
+Node* find_first(Node *head, int x){
+    for(Node *c = head; c != NULL; c = c->next) 
+        if(c->data == x) 
+            return c;
+    return NULL;
+}
+
+// Giải phóng bộ nhớ
+void clear_list(Node **head){
+    Node *c = *head;
+    while(c != NULL){ 
+        Node *next = c->next;
+        free(c);
+        c = next;
+    }
+    *head = NULL;
+}
+
+int main(){
+    Node *head = NULL;
+    int n;
+    
+    // Đọc n
+    if(scanf("%d", &n) != 1) 
+        return 0;
+    
+    // Đọc n số và thêm vào cuối
+    for(int i = 0; i < n; i++){ 
+        int x; 
+        scanf("%d", &x); 
+        push_back(&head, x); 
+    }
+    
+    // In danh sách
+    printf("Danh sach: ");
+    print_list(head);
+    
+    // Đếm số phần tử
+    printf("So phan tu: %d\n", size(head));
+    
+    // Tìm giá trị x
+    int x;
+    printf("Nhap gia tri can tim: ");
+    scanf("%d", &x);
+    
+    Node *result = find_first(head, x);
+    if(result != NULL)
+        printf("FOUND: %d\n", result->data);
+    else
+        printf("NOT FOUND\n");
+    
+    // Giải phóng bộ nhớ
+    clear_list(&head);
+    return 0;
+}
