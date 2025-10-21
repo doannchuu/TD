@@ -1,0 +1,209 @@
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+// 1. CẤU TRÚC SỐ HẠNG
+struct Term {
+    double heSo;    // Hệ số
+    int soMu;       // Số mũ
+    Term* next;     // Con trỏ đến số hạng kế tiếp
+    
+    // Constructor
+    Term(double hs = 0, int sm = 0) : heSo(hs), soMu(sm), next(nullptr) {}
+};
+
+// 2. CẤU TRÚC ĐA THỨC
+struct DaThuc {
+    Term* head;     // Con trỏ đến số hạng đầu tiên
+    
+    // Constructor
+    DaThuc() : head(nullptr) {}
+};
+
+// 3. HÀM KHỞI TẠO ĐA THỨC RỖNG
+void initDaThuc(DaThuc& dt) {
+    dt.head = nullptr;
+}
+
+// 4. HÀM THÊM SỐ HẠNG VÀO ĐA THỨC (sắp xếp giảm dần theo số mũ)
+void themSoHang(DaThuc& dt, double heSo, int soMu) {
+    // Bỏ qua số hạng có hệ số = 0
+    if (heSo == 0) return;
+    
+    Term* newTerm = new Term(heSo, soMu);
+    
+    // Trường hợp đa thức rỗng hoặc thêm vào đầu
+    if (dt.head == nullptr || soMu > dt.head->soMu) {
+        newTerm->next = dt.head;
+        dt.head = newTerm;
+        return;
+    }
+    
+    // Tìm vị trí thích hợp (sắp xếp giảm dần theo số mũ)
+    Term* current = dt.head;
+    while (current->next != nullptr && current->next->soMu > soMu) {
+        current = current->next;
+    }
+    
+    // Kiểm tra nếu số mũ đã tồn tại thì cộng hệ số
+    if (current->soMu == soMu) {
+        current->heSo += heSo;
+        delete newTerm;  // Không cần tạo mới
+        // Nếu hệ số trở thành 0 thì xóa số hạng
+        if (current->heSo == 0) {
+            // Xử lý xóa node (cần implement thêm)
+        }
+    } else {
+        // Chèn vào vị trí thích hợp
+        newTerm->next = current->next;
+        current->next = newTerm;
+    }
+}
+
+// 5. HÀM NHẬP ĐA THỨC TỪ NGƯỜI DÙNG
+void nhapDaThuc(DaThuc& dt) {
+    int n;
+    cout << "Nhap so luong so hang cua da thuc: ";
+    cin >> n;
+    
+    for (int i = 0; i < n; i++) {
+        double heSo;
+        int soMu;
+        
+        cout << "Nhap so hang thu " << (i + 1) << ":" << endl;
+        cout << "  He so: ";
+        cin >> heSo;
+        cout << "  So mu: ";
+        cin >> soMu;
+        
+        themSoHang(dt, heSo, soMu);
+    }
+}
+
+// 6. HÀM HIỂN THỊ ĐA THỨC
+void hienThiDaThuc(const DaThuc& dt) {
+    if (dt.head == nullptr) {
+        cout << "0";
+        return;
+    }
+    
+    Term* current = dt.head;
+    bool firstTerm = true;
+    
+    while (current != nullptr) {
+        // Xử lý dấu
+        if (!firstTerm) {
+            if (current->heSo > 0) {
+                cout << " + ";
+            } else {
+                cout << " - ";
+            }
+        } else {
+            if (current->heSo < 0) {
+                cout << "-";
+            }
+        }
+        
+        // Hiển thị hệ số (lấy giá trị tuyệt đối)
+        double absHeSo = abs(current->heSo);
+        
+        // Hiển thị số hạng
+        if (current->soMu == 0) {
+            // Số hạng hằng số
+            cout << absHeSo;
+        } else if (current->soMu == 1) {
+            // Số hạng bậc 1
+            if (absHeSo == 1) {
+                cout << "x";
+            } else {
+                cout << absHeSo << "x";
+            }
+        } else {
+            // Số hạng bậc cao
+            if (absHeSo == 1) {
+                cout << "x^" << current->soMu;
+            } else {
+                cout << absHeSo << "x^" << current->soMu;
+            }
+        }
+        
+        firstTerm = false;
+        current = current->next;
+    }
+    cout << endl;
+}
+
+// 7. HÀM GIẢI PHÓNG BỘ NHỚ
+void xoaDaThuc(DaThuc& dt) {
+    Term* current = dt.head;
+    while (current != nullptr) {
+        Term* nextTerm = current->next;
+        delete current;
+        current = nextTerm;
+    }
+    dt.head = nullptr;
+}
+
+// 8. HÀM NHẬP ĐA THỨC TỪ CHUỖI (NÂNG CAO)
+void nhapDaThucTuChuoi(DaThuc& dt, const string& chuoi) {
+    // Giả sử chuỗi có dạng: "3x^2 + 2x + 1"
+    // Trong thực tế cần phân tích chuỗi phức tạp hơn
+    // Ở đây demo đơn giản
+    cout << "Nhap da thuc theo dang: ax^n + bx^m + ... + c" << endl;
+    cout << "Vi du: 3x^2 + 2x + 1" << endl;
+    
+    int n;
+    cout << "Nhap so luong so hang: ";
+    cin >> n;
+    
+    for (int i = 0; i < n; i++) {
+        double heSo;
+        int soMu;
+        cout << "So hang " << (i + 1) << " - He so: ";
+        cin >> heSo;
+        cout << "So hang " << (i + 1) << " - So mu: ";
+        cin >> soMu;
+        themSoHang(dt, heSo, soMu);
+    }
+}
+
+// 9. HÀM CHÍNH
+int main() {
+    DaThuc dt;
+    initDaThuc(dt);
+    
+    int choice;
+    
+    do {
+        cout << "\n  QUAN LY DA THUC  " << endl;
+        cout << "1. Nhap da thuc" << endl;
+        cout << "2. Hien thi da thuc" << endl;
+        cout << "3. Thoat" << endl;
+        cout << "Chon chuc nang: ";
+        cin >> choice;
+        
+        switch (choice) {
+            case 1:
+                xoaDaThuc(dt);  // Xóa đa thức cũ trước khi nhập mới
+                nhapDaThuc(dt);
+                break;
+                
+            case 2:
+                cout << "Da thuc: ";
+                hienThiDaThuc(dt);
+                break;
+                
+            case 3:
+                cout << "Thoat chuong trinh." << endl;
+                break;
+                
+            default:
+                cout << "Chuc nang khong hop le!" << endl;
+        }
+    } while (choice != 3);
+    
+    // Giải phóng bộ nhớ trước khi thoát
+    xoaDaThuc(dt);
+    
+    return 0;
+}
